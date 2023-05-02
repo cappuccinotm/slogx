@@ -40,6 +40,10 @@ func main() {
 		slog.String("details", "some important error details"),
 		slogx.Error(errors.New("some error")),
 	)
+
+	logger.WithGroup("group1").InfoCtx(ctx, "some message",
+		slog.String("key", "value"),
+	)
 }
 ```
 
@@ -64,6 +68,18 @@ Produces:
   "error": "some error",
   "request_id": "36f90947-cf6e-49be-9cf2-c59a124a6dcb",
   "stacktrace": "main.main()\n\t/.../github.com/cappuccinotm/slogx/_example/main.go:30 +0x3e4\n"
+}
+```
+```json
+{
+   "time": "2023-05-02T04:59:43.50776+03:00",
+   "level": "INFO",
+   "source": "/.../github.com/cappuccinotm/slogx/_example/main.go:55",
+   "msg": "some message",
+   "group1": {
+       "key": "value",
+       "request_id": "97222728-485c-44ad-8142-0ef46c70d52b"
+   }
 }
 ```
 
