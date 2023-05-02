@@ -91,3 +91,5 @@ l := logger.New(
 - `logger.WithBody(maxBodySize int)` - logs the request and response body, maximum size of the logged body is set by `maxBodySize`.
 - `logger.WithUser(fn func(*http.Request) (string, error))` - sets a function to get the user data from the request.
 
+## Status
+The code is still under development. Until v1.x released (as well as the `slog` package reaches the stdlib) the API may change.
