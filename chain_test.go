@@ -64,7 +64,14 @@ func TestChain_Handle(t *testing.T) {
 
 func TestChain_WithGroup(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := NewChain(slog.NewJSONHandler(buf)).WithGroup("test-group")
+	h := NewChain(slog.NewJSONHandler(buf),
+		func(next HandleFunc) HandleFunc {
+			return func(ctx context.Context, rec slog.Record) error {
+				rec.Add(slog.String("x-request-id", "x-request-id"))
+				return next(ctx, rec)
+			}
+		},
+	).WithGroup("test-group")
 
 	logger := slog.New(h)
 	logger.Info("test", slog.String("a", "1"))
@@ -75,10 +82,12 @@ func TestChain_WithGroup(t *testing.T) {
 		TestGroup struct {
 			A string `json:"a"`
 		} `json:"test-group"`
+		XRequestID string `json:"x-request-id"`
 	}
 
 	require.NoError(t, json.NewDecoder(buf).Decode(&entry))
 	assert.Equal(t, "1", entry.TestGroup.A)
+	assert.Equal(t, "x-request-id", entry.XRequestID)
 }
 
 func TestChain_WithAttrs(t *testing.T) {

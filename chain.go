@@ -27,10 +27,11 @@ func (c *Chain) Handle(ctx context.Context, rec slog.Record) error {
 }
 
 // WithGroup returns a new Chain with the given group.
+// It applies middlewares on the top-level handler.
 func (c *Chain) WithGroup(group string) slog.Handler {
-	return &Chain{
-		mws:     c.mws,
-		Handler: c.Handler.WithGroup(group),
+	return &groupHandler{
+		group:   group,
+		Handler: c,
 	}
 }
 
@@ -40,4 +41,29 @@ func (c *Chain) WithAttrs(attrs []slog.Attr) slog.Handler {
 		mws:     c.mws,
 		Handler: c.Handler.WithAttrs(attrs),
 	}
+}
+
+type groupHandler struct {
+	group string
+	slog.Handler
+}
+
+func (h *groupHandler) WithGroup(group string) slog.Handler {
+	return &groupHandler{
+		group:   group,
+		Handler: h,
+	}
+}
+
+func (h *groupHandler) Handle(ctx context.Context, rec slog.Record) error {
+	var attrs []slog.Attr
+	rec.Attrs(func(attr slog.Attr) bool {
+		attrs = append(attrs, attr)
+		return true
+	})
+
+	r := slog.NewRecord(rec.Time, rec.Level, rec.Message, rec.PC)
+	r.AddAttrs(slog.Group(h.group, attrs...))
+
+	return h.Handler.Handle(ctx, r)
 }
