@@ -66,3 +66,28 @@ Produces:
   "stacktrace": "main.main()\n\t/.../github.com/cappuccinotm/slogx/_example/main.go:30 +0x3e4\n"
 }
 ```
+
+## Middlewares
+- `slogx.RequestID()` - adds a request ID to the context and logs it.
+  - `slogx.ContextWithRequestID(ctx context.Context, requestID string) context.Context` - adds a request ID to the context.
+- `slogx.StacktraceOnError()` - adds a stacktrace to the log entry if log entry's level is ERROR.
+
+## Client/Server logger
+Package slogx also contains a `logger` package, which provides a `Logger` service, that could be used
+as an HTTP server middleware and a `http.RoundTripper`, that logs HTTP requests and responses.
+
+### Usage
+```go
+l := logger.New(
+    logger.WithLogger(slog.Default()),
+    logger.WithBody(1024),
+    logger.WithUser(func(*http.Request) (string, error) { return "username", nil }),
+)
+```
+
+### Options
+- `logger.WithLogger(logger slog.Logger)` - sets the slog logger.
+- `logger.WithLogFn(fn func(context.Context, *LogParts))` - sets a custom function to log request and response.
+- `logger.WithBody(maxBodySize int)` - logs the request and response body, maximum size of the logged body is set by `maxBodySize`.
+- `logger.WithUser(fn func(*http.Request) (string, error))` - sets a function to get the user data from the request.
+
