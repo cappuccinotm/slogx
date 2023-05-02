@@ -1,2 +1,68 @@
-# slogx
-slog logger extensions
+# slogx (https://pkg.go.dev/badge/github.com/cappuccinotm/slogx.svg)](https://pkg.go.dev/github.com/cappuccinotm/slogx) [![Go](https://github.com/cappuccinotm/slogx/actions/workflows/go.yaml/badge.svg)](https://github.com/cappuccinotm/slogx/actions/workflows/go.yaml) [![codecov](https://codecov.io/gh/cappuccinotm/slogx/branch/master/graph/badge.svg?token=I8SsMkdRqd)](https://codecov.io/gh/cappuccinotm/slogx)
+Package slogx contains extensions for standard library's slog package.
+
+## Install
+```bash
+go get github.com/cappuccinotm/slogx
+```
+
+## Usage
+
+```go
+package main
+
+import (
+	"context"
+	"errors"
+	"os"
+
+	"github.com/cappuccinotm/slogx"
+	"github.com/google/uuid"
+	"golang.org/x/exp/slog"
+)
+
+func main() {
+	h := slog.HandlerOptions{AddSource: true, Level: slog.LevelInfo}.
+		NewJSONHandler(os.Stderr)
+
+	logger := slog.New(slogx.NewChain(h,
+		slogx.RequestID(),
+		slogx.StacktraceOnError(),
+	))
+
+	ctx := slogx.ContextWithRequestID(context.Background(), uuid.New().String())
+	logger.InfoCtx(ctx,
+		"some message",
+		slog.String("key", "value"),
+	)
+	
+	logger.ErrorCtx(ctx, "oh no, an error occurred",
+		slog.String("details", "some important error details"),
+		slogx.Error(errors.New("some error")),
+	)
+}
+```
+
+Produces:
+```json
+{
+   "time": "2023-05-02T02:59:05.108479+03:00",
+   "level": "INFO",
+   "source": "/.../github.com/cappuccinotm/slogx/_example/main.go:23",
+   "msg": "some message",
+   "key": "value",
+   "request_id": "36f90947-cf6e-49be-9cf2-c59a124a6dcb"
+}
+```
+``` json
+{
+  "time": "2023-05-02T02:59:05.108786+03:00",
+  "level": "ERROR",
+  "source": "/.../github.com/cappuccinotm/slogx/_example/main.go:30",
+  "msg": "oh no, an error occurred",
+  "details": "some important error details",
+  "error": "some error",
+  "request_id": "36f90947-cf6e-49be-9cf2-c59a124a6dcb",
+  "stacktrace": "main.main()\n\t/.../github.com/cappuccinotm/slogx/_example/main.go:30 +0x3e4\n"
+}
+```
