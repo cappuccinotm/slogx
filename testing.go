@@ -15,7 +15,7 @@ type nopHandler struct{}
 func (nopHandler) Enabled(context.Context, slog.Level) bool  { return false }
 func (nopHandler) Handle(context.Context, slog.Record) error { return nil }
 func (n nopHandler) WithAttrs([]slog.Attr) slog.Handler      { return n }
-func (n nopHandler) WithGroup(name string) slog.Handler      { return n }
+func (n nopHandler) WithGroup(string) slog.Handler           { return n }
 
 // TestHandler returns a slog.Handler, that directs all log messages to the
 // t.Logf function with the "[slog]" prefix.
