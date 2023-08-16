@@ -56,7 +56,7 @@ Produces:
     "level": "INFO",
     "source": {
         "function": "main.main",
-        "file": "/.../github.com/cappuccinotm/slogx/_example/main.go",
+        "file": "/Users/semior/go/src/github.com/cappuccinotm/slogx/_example/main.go",
         "line": 25
     },
     "msg": "some message",
