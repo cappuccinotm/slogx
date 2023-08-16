@@ -1,18 +1,19 @@
-package slogx
+package slogm
 
 import (
 	"context"
 	"encoding"
 	"encoding/json"
 	"fmt"
+	"github.com/cappuccinotm/slogx"
 	"log/slog"
 	"reflect"
 )
 
 // TrimAttrs returns a middleware that trims attributes of String and Any kind
 // to the provided limit.
-func TrimAttrs(limit int) Middleware {
-	return func(next HandleFunc) HandleFunc {
+func TrimAttrs(limit int) slogx.Middleware {
+	return func(next slogx.HandleFunc) slogx.HandleFunc {
 		return func(ctx context.Context, rec slog.Record) error {
 			var nattrs []slog.Attr
 			hasOversizedAttrs := false

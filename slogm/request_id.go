@@ -1,7 +1,8 @@
-package slogx
+package slogm
 
 import (
 	"context"
+	"github.com/cappuccinotm/slogx"
 
 	"log/slog"
 )
@@ -20,11 +21,11 @@ func RequestIDFromContext(ctx context.Context) (string, bool) {
 }
 
 // RequestID returns a middleware that adds request id to record.
-func RequestID() Middleware {
-	return func(next HandleFunc) HandleFunc {
+func RequestID() slogx.Middleware {
+	return func(next slogx.HandleFunc) slogx.HandleFunc {
 		return func(ctx context.Context, rec slog.Record) error {
 			if reqID, ok := RequestIDFromContext(ctx); ok {
-				rec.AddAttrs(slog.String(RequestIDKey, reqID))
+				rec.AddAttrs(slog.String(slogx.RequestIDKey, reqID))
 			}
 			return next(ctx, rec)
 		}

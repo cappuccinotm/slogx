@@ -1,9 +1,10 @@
-package slogx
+package slogm
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/cappuccinotm/slogx"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,7 +15,7 @@ import (
 func TestStacktraceOnError(t *testing.T) {
 	t.Run("in chain", func(t *testing.T) {
 		buf := &bytes.Buffer{}
-		h := NewChain(slog.NewJSONHandler(buf, nil), StacktraceOnError())
+		h := slogx.NewChain(slog.NewJSONHandler(buf, nil), StacktraceOnError())
 
 		slog.New(h).Error("something bad happened",
 			slog.String("detail", "oh my! some error occurred"),
@@ -32,7 +33,7 @@ func TestStacktraceOnError(t *testing.T) {
 		assert.Equal(t, "oh my! some error occurred", entry.Detail)
 
 		t.Log("stacktrace:\n", entry.Stack)
-		assert.Contains(t, entry.Stack, "github.com/cappuccinotm/slogx.TestStacktraceOnError")
+		assert.Contains(t, entry.Stack, "github.com/cappuccinotm/slogx/slom.TestStacktraceOnError")
 		assert.NotContains(t, entry.Stack, "slogx/chain.go")
 	})
 
@@ -50,7 +51,7 @@ func TestStacktraceOnError(t *testing.T) {
 				found = true
 
 				v := attr.Value.String()
-				assert.Contains(t, v, "github.com/cappuccinotm/slogx.TestStacktraceOnError")
+				assert.Contains(t, v, "github.com/cappuccinotm/slogx/slom.TestStacktraceOnError")
 				t.Log("stacktrace:\n", v)
 				return false
 			})
