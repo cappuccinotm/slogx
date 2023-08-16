@@ -22,10 +22,10 @@ import (
 )
 
 func main() {
-    h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
-        AddSource: true,
-        Level:     slog.LevelInfo,
-    })
+	h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelInfo,
+	})
 
 	logger := slog.New(slogx.NewChain(h,
 		slogx.RequestID(),
@@ -56,7 +56,7 @@ Produces:
     "level": "INFO",
     "source": {
         "function": "main.main",
-        "file": "/.../github.com/cappuccinotm/slogx/_example/main.go",
+        "file": "/Users/semior/go/src/github.com/cappuccinotm/slogx/_example/main.go",
         "line": 25
     },
     "msg": "some message",
@@ -98,9 +98,10 @@ Produces:
 ```
 
 ## Middlewares
-- `slogx.RequestID()` - adds a request ID to the context and logs it.
-  - `slogx.ContextWithRequestID(ctx context.Context, requestID string) context.Context` - adds a request ID to the context.
-- `slogx.StacktraceOnError()` - adds a stacktrace to the log entry if log entry's level is ERROR.
+- `slogm.RequestID()` - adds a request ID to the context and logs it.
+  - `slogm.ContextWithRequestID(ctx context.Context, requestID string) context.Context` - adds a request ID to the context.
+- `slogm.StacktraceOnError()` - adds a stacktrace to the log entry if log entry's level is ERROR.
+- `slogm.TrimAttrs(limit int)` - trims the length of the attributes to `limit`.
 
 ## Client/Server logger
 Package slogx also contains a `logger` package, which provides a `Logger` service, that could be used
@@ -122,4 +123,4 @@ l := logger.New(
 - `logger.WithUser(fn func(*http.Request) (string, error))` - sets a function to get the user data from the request.
 
 ## Status
-The code is still under development. Until v1.x released (as well as the `slog` package reaches the stdlib) the API may change.
+The code is still under development. Until v1.x released the API may change.

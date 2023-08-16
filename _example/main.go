@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"github.com/cappuccinotm/slogx/slogm"
 	"os"
 
 	"github.com/cappuccinotm/slogx"
@@ -17,11 +18,11 @@ func main() {
 	})
 
 	logger := slog.New(slogx.NewChain(h,
-		slogx.RequestID(),
-		slogx.StacktraceOnError(),
+		slogm.RequestID(),
+		slogm.StacktraceOnError(),
 	))
 
-	ctx := slogx.ContextWithRequestID(context.Background(), uuid.New().String())
+	ctx := slogm.ContextWithRequestID(context.Background(), uuid.New().String())
 	logger.InfoContext(ctx,
 		"some message",
 		slog.String("key", "value"),

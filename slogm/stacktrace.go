@@ -1,7 +1,8 @@
-package slogx
+package slogm
 
 import (
 	"context"
+	"github.com/cappuccinotm/slogx"
 	"regexp"
 	"runtime"
 
@@ -11,8 +12,8 @@ import (
 var reTrace = regexp.MustCompile(`.*/slog/logger\.go.*\n`)
 
 // StacktraceOnError returns a middleware that adds stacktrace to record if level is error.
-func StacktraceOnError() Middleware {
-	return func(next HandleFunc) HandleFunc {
+func StacktraceOnError() slogx.Middleware {
+	return func(next slogx.HandleFunc) slogx.HandleFunc {
 		return func(ctx context.Context, rec slog.Record) error {
 			if rec.Level != slog.LevelError {
 				return next(ctx, rec)

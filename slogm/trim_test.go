@@ -1,4 +1,4 @@
-package slogx
+package slogm
 
 import (
 	"context"
