@@ -52,36 +52,48 @@ func main() {
 Produces:
 ```json
 {
-   "time": "2023-05-02T02:59:05.108479+03:00",
-   "level": "INFO",
-   "source": "/.../github.com/cappuccinotm/slogx/_example/main.go:23",
-   "msg": "some message",
-   "key": "value",
-   "request_id": "36f90947-cf6e-49be-9cf2-c59a124a6dcb"
+    "time": "2023-08-17T02:04:19.281961+06:00",
+    "level": "INFO",
+    "source": {
+        "function": "main.main",
+        "file": "/.../github.com/cappuccinotm/slogx/_example/main.go",
+        "line": 25
+    },
+    "msg": "some message",
+    "key": "value",
+    "request_id": "bcda1960-fa4d-46b3-9c1b-fec72c7c07a3"
 }
 ```
 ``` json
 {
-  "time": "2023-05-02T02:59:05.108786+03:00",
-  "level": "ERROR",
-  "source": "/.../github.com/cappuccinotm/slogx/_example/main.go:30",
-  "msg": "oh no, an error occurred",
-  "details": "some important error details",
-  "error": "some error",
-  "request_id": "36f90947-cf6e-49be-9cf2-c59a124a6dcb",
-  "stacktrace": "main.main()\n\t/.../github.com/cappuccinotm/slogx/_example/main.go:30 +0x3e4\n"
+    "time": "2023-08-17T02:04:19.282077+06:00",
+    "level": "ERROR",
+    "source": {
+        "function": "main.main",
+        "file": "/Users/semior/go/src/github.com/cappuccinotm/slogx/_example/main.go",
+        "line": 40
+    },
+    "msg": "oh no, an error occurred",
+    "details": "some important error details",
+    "error": "some error",
+    "request_id": "bcda1960-fa4d-46b3-9c1b-fec72c7c07a3",
+    "stacktrace": "main.main()\n\t/Users/semior/go/src/github.com/cappuccinotm/slogx/_example/main.go:40 +0x41c\n"
 }
 ```
 ```json
 {
-   "time": "2023-05-02T04:59:43.50776+03:00",
-   "level": "INFO",
-   "source": "/.../github.com/cappuccinotm/slogx/_example/main.go:55",
-   "msg": "some message",
-   "group1": {
-       "key": "value",
-       "request_id": "97222728-485c-44ad-8142-0ef46c70d52b"
-   }
+    "time": "2023-08-17T02:04:19.282137+06:00",
+    "level": "INFO",
+    "source": {
+        "function": "main.main",
+        "file": "/Users/semior/go/src/github.com/cappuccinotm/slogx/_example/main.go",
+        "line": 57
+    },
+    "msg": "some message",
+    "group1": {
+        "key": "value"
+    },
+    "request_id": "bcda1960-fa4d-46b3-9c1b-fec72c7c07a3"
 }
 ```
 
