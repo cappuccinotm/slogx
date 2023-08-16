@@ -31,9 +31,11 @@ func main() {
 	logger := slog.New(slogx.NewChain(h,
 		slogm.RequestID(),
 		slogm.StacktraceOnError(),
+		slogm.MaskSecrets("***"),
 	))
 
-	ctx := slogx.ContextWithRequestID(context.Background(), uuid.New().String())
+	ctx := slogm.ContextWithRequestID(context.Background(), uuid.New().String())
+	ctx = slogm.ContextWithSecrets(ctx, "secret")
 	logger.InfoContext(ctx,
 		"some message",
 		slog.String("key", "value"),
@@ -67,18 +69,18 @@ Produces:
 ```
 ``` json
 {
-    "time": "2023-08-17T02:04:19.282077+06:00",
+    "time": "2023-08-17T03:35:21.251385+06:00",
     "level": "ERROR",
     "source": {
         "function": "main.main",
         "file": "/Users/semior/go/src/github.com/cappuccinotm/slogx/_example/main.go",
-        "line": 40
+        "line": 47
     },
     "msg": "oh no, an error occurred",
-    "details": "some important error details",
+    "details": "some important *** error details",
     "error": "some error",
-    "request_id": "bcda1960-fa4d-46b3-9c1b-fec72c7c07a3",
-    "stacktrace": "main.main()\n\t/Users/semior/go/src/github.com/cappuccinotm/slogx/_example/main.go:40 +0x41c\n"
+    "request_id": "8ba29407-5d58-4dca-99e9-54528b1ae3f0",
+    "stacktrace": "main.main()\n\t/Users/semior/go/src/github.com/cappuccinotm/slogx/_example/main.go:47 +0x4a4\n"
 }
 ```
 ```json
@@ -103,6 +105,8 @@ Produces:
   - `slogm.ContextWithRequestID(ctx context.Context, requestID string) context.Context` - adds a request ID to the context.
 - `slogm.StacktraceOnError()` - adds a stacktrace to the log entry if log entry's level is ERROR.
 - `slogm.TrimAttrs(limit int)` - trims the length of the attributes to `limit`.
+- `slogm.MaskSecrets(replacement string)` - masks secrets in logs, which are stored in the context
+  - `slogm.ContextWithSecrets(ctx context.Context, secret ...string) context.Context` - adds a secret value to the context
 
 ## Client/Server logger
 Package slogx also contains a `logger` package, which provides a `Logger` service, that could be used

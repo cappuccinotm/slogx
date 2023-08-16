@@ -2,16 +2,13 @@ package slogm
 
 import (
 	"context"
-	"encoding"
-	"encoding/json"
-	"fmt"
 	"github.com/cappuccinotm/slogx"
 	"log/slog"
 	"reflect"
 )
 
-// TrimAttrs returns a middleware that trims attributes of String and Any kind
-// to the provided limit.
+// TrimAttrs returns a middleware that trims attributes to the provided limit.
+// Works only with attributes of type String/[]byte or Any.
 func TrimAttrs(limit int) slogx.Middleware {
 	return func(next slogx.HandleFunc) slogx.HandleFunc {
 		return func(ctx context.Context, rec slog.Record) error {
@@ -39,32 +36,8 @@ func TrimAttrs(limit int) slogx.Middleware {
 func trim(limit int, attr slog.Attr) (res slog.Attr, trimmed bool) {
 	attr.Value = attr.Value.Resolve()
 
-	str := ""
-	switch attr.Value.Kind() {
-	case slog.KindString:
-		str = attr.Value.String()
-	case slog.KindAny:
-		a := attr.Value.Any()
-
-		if tm, ok := a.(encoding.TextMarshaler); ok {
-			data, _ := tm.MarshalText()
-			str = string(data)
-			break
-		}
-
-		if jm, ok := a.(json.Marshaler); ok {
-			data, _ := jm.MarshalJSON()
-			str = string(data)
-			break
-		}
-
-		if bs, ok := byteSlice(a); ok {
-			str = string(bs)
-			break
-		}
-
-		str = fmt.Sprintf("%+v", a)
-	default:
+	str, ok := stringValue(attr)
+	if !ok {
 		return attr, false
 	}
 
