@@ -1,3 +1,5 @@
+// Package slogm contains middlewares for chaining and
+// decoupling process of enriching or reducing logs.
 package slogm
 
 import (
