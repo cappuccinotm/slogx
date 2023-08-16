@@ -33,7 +33,7 @@ func TestStacktraceOnError(t *testing.T) {
 		assert.Equal(t, "oh my! some error occurred", entry.Detail)
 
 		t.Log("stacktrace:\n", entry.Stack)
-		assert.Contains(t, entry.Stack, "github.com/cappuccinotm/slogx/slom.TestStacktraceOnError")
+		assert.Contains(t, entry.Stack, "github.com/cappuccinotm/slogx/slogm.TestStacktraceOnError")
 		assert.NotContains(t, entry.Stack, "slogx/chain.go")
 	})
 
@@ -51,7 +51,7 @@ func TestStacktraceOnError(t *testing.T) {
 				found = true
 
 				v := attr.Value.String()
-				assert.Contains(t, v, "github.com/cappuccinotm/slogx/slom.TestStacktraceOnError")
+				assert.Contains(t, v, "github.com/cappuccinotm/slogx/slogm.TestStacktraceOnError")
 				t.Log("stacktrace:\n", v)
 				return false
 			})
