@@ -12,7 +12,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 func TestLogger(t *testing.T) {
@@ -34,7 +34,7 @@ func TestLogger(t *testing.T) {
 
 		buf := &bytes.Buffer{}
 		l := New(
-			WithLogger(slog.New(slog.NewJSONHandler(buf))),
+			WithLogger(slog.New(slog.NewJSONHandler(buf, nil))),
 			WithBody(1024),
 			WithUser(func(*http.Request) (string, error) { return "username", nil }),
 		)
@@ -108,7 +108,7 @@ func TestLogger(t *testing.T) {
 	t.Run("server middleware", func(t *testing.T) {
 		buf := &bytes.Buffer{}
 		l := New(
-			WithLogger(slog.New(slog.NewJSONHandler(buf))),
+			WithLogger(slog.New(slog.NewJSONHandler(buf, nil))),
 			WithBody(1024),
 			WithUser(func(*http.Request) (string, error) { return "username", nil }),
 		)

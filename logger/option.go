@@ -6,7 +6,7 @@ import (
 	"net/url"
 
 	"github.com/cappuccinotm/slogx"
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 // Option is a function that configures a Logger.
@@ -43,7 +43,7 @@ func Log2Slog(ctx context.Context, parts *LogParts, logger *slog.Logger) {
 		msg = "http client request"
 	}
 
-	reqAttrs := []slog.Attr{
+	reqAttrs := []any{
 		slog.String("method", parts.Request.Method),
 		slog.String("url", parts.Request.URL),
 		slog.Any("headers", parts.Request.Headers),
@@ -53,7 +53,7 @@ func Log2Slog(ctx context.Context, parts *LogParts, logger *slog.Logger) {
 	reqAttrs = appendNotEmpty(reqAttrs, "user", parts.Request.User)
 	reqAttrs = appendNotEmpty(reqAttrs, "body", parts.Request.Body)
 
-	respAttrs := []slog.Attr{
+	respAttrs := []any{
 		slog.Int("status", parts.Response.Status),
 		slog.Int64("size", parts.Response.Size),
 		slog.Any("headers", parts.Response.Headers),
@@ -63,7 +63,7 @@ func Log2Slog(ctx context.Context, parts *LogParts, logger *slog.Logger) {
 		respAttrs = append(respAttrs, slogx.Error(parts.Response.Error))
 	}
 
-	logger.InfoCtx(ctx, msg,
+	logger.InfoContext(ctx, msg,
 		slog.Time("start_at", parts.StartAt),
 		slog.Duration("duration", parts.Duration),
 		slog.Group("request", reqAttrs...),
@@ -71,7 +71,7 @@ func Log2Slog(ctx context.Context, parts *LogParts, logger *slog.Logger) {
 	)
 }
 
-func appendNotEmpty(attrs []slog.Attr, k, v string) []slog.Attr {
+func appendNotEmpty(attrs []any, k, v string) []any {
 	if v != "" {
 		return append(attrs, slog.String(k, v))
 	}

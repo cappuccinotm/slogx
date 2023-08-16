@@ -7,12 +7,14 @@ import (
 
 	"github.com/cappuccinotm/slogx"
 	"github.com/google/uuid"
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 func main() {
-	h := slog.HandlerOptions{AddSource: true, Level: slog.LevelInfo}.
-		NewJSONHandler(os.Stderr)
+	h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelInfo,
+	})
 
 	logger := slog.New(slogx.NewChain(h,
 		slogx.RequestID(),
@@ -20,50 +22,62 @@ func main() {
 	))
 
 	ctx := slogx.ContextWithRequestID(context.Background(), uuid.New().String())
-	logger.InfoCtx(ctx,
+	logger.InfoContext(ctx,
 		"some message",
 		slog.String("key", "value"),
 	)
 
 	// produces:
 	// {
-	//    "time": "2023-05-02T02:59:05.108479+03:00",
+	//    "time": "2023-08-17T02:04:19.281961+06:00",
 	//    "level": "INFO",
-	//    "source": "/.../github.com/cappuccinotm/slogx/_example/main.go:23",
+	//    "source": {
+	//        "function": "main.main",
+	//        "file": "/.../github.com/cappuccinotm/slogx/_example/main.go",
+	//        "line": 25
+	//    },
 	//    "msg": "some message",
 	//    "key": "value",
-	//    "request_id": "36f90947-cf6e-49be-9cf2-c59a124a6dcb"
+	//    "request_id": "bcda1960-fa4d-46b3-9c1b-fec72c7c07a3"
 	// }
 
-	logger.ErrorCtx(ctx, "oh no, an error occurred",
+	logger.ErrorContext(ctx, "oh no, an error occurred",
 		slog.String("details", "some important error details"),
 		slogx.Error(errors.New("some error")),
 	)
 
 	// produces:
 	// {
-	//    "time": "2023-05-02T02:59:05.108786+03:00",
+	//    "time": "2023-08-17T02:04:19.282077+06:00",
 	//    "level": "ERROR",
-	//    "source": "/.../github.com/cappuccinotm/slogx/_example/main.go:30",
+	//    "source": {
+	//        "function": "main.main",
+	//        "file": "/.../github.com/cappuccinotm/slogx/_example/main.go",
+	//        "line": 40
+	//    },
 	//    "msg": "oh no, an error occurred",
 	//    "details": "some important error details",
 	//    "error": "some error",
-	//    "request_id": "36f90947-cf6e-49be-9cf2-c59a124a6dcb",
-	//    "stacktrace": "main.main()\n\t/.../github.com/cappuccinotm/slogx/_example/main.go:30 +0x3e4\n"
-	// }
+	//    "request_id": "bcda1960-fa4d-46b3-9c1b-fec72c7c07a3",
+	//    "stacktrace": "main.main()\n\t/Users/semior/go/src/github.com/cappuccinotm/slogx/_example/main.go:40 +0x41c\n"
+	//}
 
-	logger.WithGroup("group1").InfoCtx(ctx, "some message",
+	logger.WithGroup("group1").InfoContext(ctx, "some message",
 		slog.String("key", "value"))
 
 	// produces:
 	// {
-	//    "time": "2023-05-02T04:59:43.50776+03:00",
+	//    "time": "2023-08-17T02:04:19.282137+06:00",
 	//    "level": "INFO",
-	//    "source": "/.../github.com/cappuccinotm/slogx/_example/main.go:55",
+	//    "source": {
+	//        "function": "main.main",
+	//        "file": "/.../github.com/cappuccinotm/slogx/_example/main.go",
+	//        "line": 57
+	//    },
 	//    "msg": "some message",
 	//    "group1": {
-	//        "key": "value",
-	//        "request_id": "97222728-485c-44ad-8142-0ef46c70d52b"
-	//    }
+	//        "key": "value"
+	//    },
+	//    "request_id": "bcda1960-fa4d-46b3-9c1b-fec72c7c07a3"
 	// }
 }

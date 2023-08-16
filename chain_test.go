@@ -8,14 +8,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 type testCtxKey struct{}
 
 func TestChain_Handle(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := NewChain(slog.NewJSONHandler(buf),
+	h := NewChain(slog.NewJSONHandler(buf, nil),
 		func(next HandleFunc) HandleFunc {
 			return func(ctx context.Context, record slog.Record) error {
 				record.AddAttrs(slog.String("a", "1"))
@@ -44,7 +44,7 @@ func TestChain_Handle(t *testing.T) {
 	ctx := context.WithValue(context.Background(), testCtxKey{}, "val")
 
 	logger := slog.New(h)
-	logger.InfoCtx(ctx, "test")
+	logger.InfoContext(ctx, "test")
 
 	t.Log(buf.String())
 
@@ -64,7 +64,7 @@ func TestChain_Handle(t *testing.T) {
 
 func TestChain_WithGroup(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := NewChain(slog.NewJSONHandler(buf),
+	h := NewChain(slog.NewJSONHandler(buf, nil),
 		func(next HandleFunc) HandleFunc {
 			return func(ctx context.Context, rec slog.Record) error {
 				rec.Add(slog.String("x-request-id", "x-request-id"))
@@ -92,10 +92,11 @@ func TestChain_WithGroup(t *testing.T) {
 
 func TestChain_WithAttrs(t *testing.T) {
 	buf := &bytes.Buffer{}
-	h := NewChain(slog.NewJSONHandler(buf)).WithAttrs([]slog.Attr{
-		slog.String("a", "1"),
-		slog.String("b", "2"),
-	})
+	h := NewChain(slog.NewJSONHandler(buf, nil)).
+		WithAttrs([]slog.Attr{
+			slog.String("a", "1"),
+			slog.String("b", "2"),
+		})
 
 	logger := slog.New(h)
 	logger.Info("test")
