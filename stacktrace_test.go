@@ -8,13 +8,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 func TestStacktraceOnError(t *testing.T) {
 	t.Run("in chain", func(t *testing.T) {
 		buf := &bytes.Buffer{}
-		h := NewChain(slog.NewJSONHandler(buf), StacktraceOnError())
+		h := NewChain(slog.NewJSONHandler(buf, nil), StacktraceOnError())
 
 		slog.New(h).Error("something bad happened",
 			slog.String("detail", "oh my! some error occurred"),

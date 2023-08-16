@@ -2,9 +2,10 @@ package slogx
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 // NopHandler returns a slog.Handler, that does nothing.
@@ -24,7 +25,7 @@ func (n nopHandler) WithGroup(string) slog.Handler           { return n }
 func TestHandler(t testingT) slog.Handler {
 	t.Helper()
 
-	opts := slog.HandlerOptions{
+	opts := &slog.HandlerOptions{
 		AddSource: true,
 		Level:     slog.LevelDebug,
 		ReplaceAttr: func(_ []string, a slog.Attr) slog.Attr {
@@ -35,15 +36,15 @@ func TestHandler(t testingT) slog.Handler {
 			case slog.LevelKey:
 				return slog.String("l", a.Value.String())
 			case slog.SourceKey:
-				// trim source to last 2 components
-				s := a.Value.String()
-				return slog.String("s", s[strings.LastIndex(s, "/")+1:])
+				src := a.Value.Any().(*slog.Source)
+				file := src.File[strings.LastIndex(src.File, "/")+1:]
+				return slog.String("s", fmt.Sprintf("%s:%d", file, src.Line))
 			default:
 				return a
 			}
 		},
 	}
-	return opts.NewTextHandler(tWriter{t})
+	return slog.NewTextHandler(tWriter{t: t}, opts)
 }
 
 type testingT interface {

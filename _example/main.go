@@ -7,12 +7,14 @@ import (
 
 	"github.com/cappuccinotm/slogx"
 	"github.com/google/uuid"
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 func main() {
-	h := slog.HandlerOptions{AddSource: true, Level: slog.LevelInfo}.
-		NewJSONHandler(os.Stderr)
+	h := slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+		AddSource: true,
+		Level:     slog.LevelInfo,
+	})
 
 	logger := slog.New(slogx.NewChain(h,
 		slogx.RequestID(),
@@ -20,7 +22,7 @@ func main() {
 	))
 
 	ctx := slogx.ContextWithRequestID(context.Background(), uuid.New().String())
-	logger.InfoCtx(ctx,
+	logger.InfoContext(ctx,
 		"some message",
 		slog.String("key", "value"),
 	)
@@ -35,7 +37,7 @@ func main() {
 	//    "request_id": "36f90947-cf6e-49be-9cf2-c59a124a6dcb"
 	// }
 
-	logger.ErrorCtx(ctx, "oh no, an error occurred",
+	logger.ErrorContext(ctx, "oh no, an error occurred",
 		slog.String("details", "some important error details"),
 		slogx.Error(errors.New("some error")),
 	)
@@ -52,7 +54,7 @@ func main() {
 	//    "stacktrace": "main.main()\n\t/.../github.com/cappuccinotm/slogx/_example/main.go:30 +0x3e4\n"
 	// }
 
-	logger.WithGroup("group1").InfoCtx(ctx, "some message",
+	logger.WithGroup("group1").InfoContext(ctx, "some message",
 		slog.String("key", "value"))
 
 	// produces:

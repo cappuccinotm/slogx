@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/tomasen/realip"
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 // Logger provides methods to log HTTP requests for both server and client sides.

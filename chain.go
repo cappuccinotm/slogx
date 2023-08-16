@@ -3,7 +3,7 @@ package slogx
 import (
 	"context"
 
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 // Chain is a chain of middleware.
@@ -56,7 +56,7 @@ func (h *groupHandler) WithGroup(group string) slog.Handler {
 }
 
 func (h *groupHandler) Handle(ctx context.Context, rec slog.Record) error {
-	var attrs []slog.Attr
+	var attrs []any
 	rec.Attrs(func(attr slog.Attr) bool {
 		attrs = append(attrs, attr)
 		return true

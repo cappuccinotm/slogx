@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"runtime"
 
-	"golang.org/x/exp/slog"
+	"log/slog"
 )
 
 var reTrace = regexp.MustCompile(`.*/slog/logger\.go.*\n`)
