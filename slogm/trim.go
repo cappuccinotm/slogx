@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/cappuccinotm/slogx"
 	"log/slog"
-	"reflect"
 )
 
 // TrimAttrs returns a middleware that trims attributes to the provided limit.
@@ -46,19 +45,4 @@ func trim(limit int, attr slog.Attr) (res slog.Attr, trimmed bool) {
 	}
 
 	return slog.String(attr.Key, str), true
-}
-
-// byteSlice returns its argument as a []byte if the argument's
-// underlying type is []byte, along with a second return value of true.
-// Otherwise, it returns nil, false.
-func byteSlice(a any) ([]byte, bool) {
-	if bs, ok := a.([]byte); ok {
-		return bs, true
-	}
-	// Like Printf's %s, we allow both the slice type and the byte element type to be named.
-	t := reflect.TypeOf(a)
-	if t != nil && t.Kind() == reflect.Slice && t.Elem().Kind() == reflect.Uint8 {
-		return reflect.ValueOf(a).Bytes(), true
-	}
-	return nil, false
 }
