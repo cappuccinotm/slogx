@@ -153,6 +153,3 @@ func TestSomething(t *testing.T) {
 //     testing.go:52: message
 //     handler.go:306: t=11:36:28.649 l=INFO s=main_test.go:17 msg="message with newlines has been printed to t.Log" key=value
 ```
-
-## Status
-The code is still under development. Until v1.x released the API may change.
