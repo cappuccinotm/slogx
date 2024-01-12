@@ -19,7 +19,7 @@ func Test_TestHandler(t *testing.T) {
 		assert.Len(t, tm.rows, 1, "should be 1 row")
 		assert.Contains(t, tm.rows[0], "t=")
 		assert.Contains(t, tm.rows[0], fmt.Sprintf(" l=%s", slog.LevelDebug.String()))
-		assert.Contains(t, tm.rows[0], " s=testing_test.go:15")
+		assert.Contains(t, tm.rows[0], " s=testing_test.go:17")
 		assert.Contains(t, tm.rows[0], fmt.Sprintf(" %s=test", slog.MessageKey))
 		assert.Contains(t, tm.rows[0], " key=value")
 
