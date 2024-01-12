@@ -240,7 +240,8 @@ func TestMaskSecrets(t *testing.T) {
 		ctx := context.Background()
 		ctx = AddSecrets(ctx, "secret")
 
-		AddSecrets(context.WithValue(ctx, "some key", "some value"), "long")
+		type someKey struct{}
+		AddSecrets(context.WithValue(ctx, someKey{}, "some value"), "long")
 
 		err := h(ctx, rec)
 		require.NoError(t, err)
