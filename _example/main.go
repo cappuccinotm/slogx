@@ -24,7 +24,7 @@ func main() {
 	))
 
 	ctx := slogm.ContextWithRequestID(context.Background(), uuid.New().String())
-	ctx = slogm.ContextWithSecrets(ctx, "secret")
+	ctx = slogm.AddSecrets(ctx, "secret")
 	logger.InfoContext(ctx,
 		"some message",
 		slog.String("key", "value"),
