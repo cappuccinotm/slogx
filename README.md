@@ -6,7 +6,21 @@ Package slogx contains extensions for standard library's slog package.
 go get github.com/cappuccinotm/slogx
 ```
 
-## Usage
+## Middlewares
+- `slogm.RequestID()` - adds a request ID to the context and logs it.
+  - `slogm.ContextWithRequestID(ctx context.Context, requestID string) context.Context` - adds a request ID to the context.
+- `slogm.StacktraceOnError()` - adds a stacktrace to the log entry if log entry's level is ERROR.
+- `slogm.TrimAttrs(limit int)` - trims the length of the attributes to `limit`.
+- `slogm.MaskSecrets(replacement string)` - masks secrets in logs, which are stored in the context
+  - `slogm.AddSecrets(ctx context.Context, secret ...string) context.Context` - adds a secret value to the context
+    - Note: secrets are stored in the context as a pointer to the container object, guarded by a mutex. Child context 
+      can safely add secrets to the context, and the secrets will be available for the parent context, but before
+      using the secrets container, the container must be initialized in the parent context with this function, e.g.:
+      ```go
+      ctx = slogm.AddSecrets(ctx)
+      ```
+
+## Example
 
 ```go
 package main
@@ -99,20 +113,6 @@ Produces:
     "request_id": "bcda1960-fa4d-46b3-9c1b-fec72c7c07a3"
 }
 ```
-
-## Middlewares
-- `slogm.RequestID()` - adds a request ID to the context and logs it.
-  - `slogm.ContextWithRequestID(ctx context.Context, requestID string) context.Context` - adds a request ID to the context.
-- `slogm.StacktraceOnError()` - adds a stacktrace to the log entry if log entry's level is ERROR.
-- `slogm.TrimAttrs(limit int)` - trims the length of the attributes to `limit`.
-- `slogm.MaskSecrets(replacement string)` - masks secrets in logs, which are stored in the context
-  - `slogm.AddSecrets(ctx context.Context, secret ...string) context.Context` - adds a secret value to the context
-    - Note: secrets are stored in the context as a pointer to the container object, guarded by a mutex. Child context 
-      can safely add secrets to the context, and the secrets will be available for the parent context, but before
-      using the secrets container, the container must be initialized in the parent context with this function, e.g.:
-      ```go
-      ctx = slogm.AddSecrets(ctx)
-      ```
 
 ## Client/Server logger
 Package slogx also contains a `logger` package, which provides a `Logger` service, that could be used
