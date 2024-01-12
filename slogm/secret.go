@@ -5,28 +5,65 @@ import (
 	"github.com/cappuccinotm/slogx"
 	"log/slog"
 	"strings"
+	"sync"
 )
 
 type secretsKey struct{}
 
-// ContextWithSecrets returns a new context with the given secret.
-func ContextWithSecrets(parent context.Context, secret ...string) context.Context {
-	var secrets []string
-	if v := parent.Value(secretsKey{}); v != nil {
-		secrets = v.([]string)
+type secretsContainer struct {
+	values []string
+	mu     sync.RWMutex
+}
+
+func (c *secretsContainer) Add(secrets ...string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.values = append(c.values, secrets...)
+}
+
+func (c *secretsContainer) Get() []string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	return c.values
+}
+
+// AddSecrets adds secrets to the context secrets container.
+func AddSecrets(ctx context.Context, secret ...string) context.Context {
+	v, ok := ctx.Value(secretsKey{}).(*secretsContainer)
+	if !ok {
+		v = &secretsContainer{}
+		ctx = context.WithValue(ctx, secretsKey{}, v)
 	}
-	secrets = append(secrets, secret...)
-	return context.WithValue(parent, secretsKey{}, secrets)
+
+	v.Add(secret...)
+	return ctx
 }
 
 // SecretsFromContext returns secrets from context.
 func SecretsFromContext(ctx context.Context) ([]string, bool) {
-	v, ok := ctx.Value(secretsKey{}).([]string)
-	return v, ok
+	v, ok := ctx.Value(secretsKey{}).(*secretsContainer)
+	if !ok {
+		return nil, false
+	}
+
+	return v.Get(), true
 }
 
 // MaskSecrets is a middleware that masks secrets (retrieved from context) in logs.
+//
 // Works only with attributes of type String/[]byte or Any.
+// If attribute is of type Any, there will be attempt to match it to:
+// - encoding.TextMarshaler
+// - json.Marshaler
+// - []byte
+// if it didn't match to any of these, it will be formatted with %+v and then masked.
+//
+// Child calls can add secrets to the container only if it's already present in the context,
+// so before any call, user should initialize it with the first "AddSecrets" call, e.g.:
+//
+//	ctx = AddSecrets(ctx)
 func MaskSecrets(replacement string) slogx.Middleware {
 	return func(next slogx.HandleFunc) slogx.HandleFunc {
 		return func(ctx context.Context, rec slog.Record) error {

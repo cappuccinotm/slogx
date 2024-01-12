@@ -61,7 +61,9 @@ func TestMaskSecrets(t *testing.T) {
 		rec := slog.NewRecord(time.Now(), slog.LevelDebug, "test", pcs[0])
 		rec.Add("key", "value")
 
-		ctx := ContextWithSecrets(context.Background(), "secret")
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "secret")
+
 		err := h(ctx, rec)
 		require.NoError(t, err)
 	})
@@ -83,7 +85,9 @@ func TestMaskSecrets(t *testing.T) {
 		rec := slog.NewRecord(time.Now(), slog.LevelDebug, "test", pcs[0])
 		rec.Add("key", "value_secret_long")
 
-		ctx := ContextWithSecrets(context.Background(), "secret")
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "secret")
+
 		err := h(ctx, rec)
 		require.NoError(t, err)
 	})
@@ -107,7 +111,9 @@ func TestMaskSecrets(t *testing.T) {
 		require.NoError(t, err)
 		rec.Add("key", addr)
 
-		ctx := ContextWithSecrets(context.Background(), "127.127")
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "127.127")
+
 		err = h(ctx, rec)
 		require.NoError(t, err)
 	})
@@ -129,7 +135,9 @@ func TestMaskSecrets(t *testing.T) {
 		rec := slog.NewRecord(time.Now(), slog.LevelDebug, "test", pcs[0])
 		rec.Add("key", json.RawMessage("some very long string"))
 
-		ctx := ContextWithSecrets(context.Background(), "very long")
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "very long")
+
 		err := h(ctx, rec)
 		require.NoError(t, err)
 	})
@@ -151,7 +159,9 @@ func TestMaskSecrets(t *testing.T) {
 		rec := slog.NewRecord(time.Now(), slog.LevelDebug, "test", pcs[0])
 		rec.Add("key", []byte("some very long string"))
 
-		ctx := ContextWithSecrets(context.Background(), "very long")
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "very long")
+
 		err := h(ctx, rec)
 		require.NoError(t, err)
 	})
@@ -174,7 +184,9 @@ func TestMaskSecrets(t *testing.T) {
 		type trickyByteSlice []uint8
 		rec.Add("key", trickyByteSlice("some very long string"))
 
-		ctx := ContextWithSecrets(context.Background(), "very long")
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "very long")
+
 		err := h(ctx, rec)
 		require.NoError(t, err)
 	})
@@ -201,7 +213,35 @@ func TestMaskSecrets(t *testing.T) {
 		rec := slog.NewRecord(time.Now(), slog.LevelDebug, "test", pcs[0])
 		rec.Add("key", testStruct{a: 1234567890, b: "somesecretvalue"})
 
-		ctx := ContextWithSecrets(context.Background(), "secret")
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "secret")
+
+		err := h(ctx, rec)
+		require.NoError(t, err)
+	})
+
+	t.Run("secret added in the child context", func(t *testing.T) {
+		mw := MaskSecrets("***")
+		h := mw(func(ctx context.Context, rec slog.Record) error {
+			assert.Equal(t, 1, rec.NumAttrs())
+			rec.Attrs(func(attr slog.Attr) bool {
+				assert.Equal(t, "key", attr.Key)
+				assert.Equal(t, "value_***_***", attr.Value.String())
+				return true
+			})
+			return nil
+		})
+
+		var pcs [1]uintptr
+		runtime.Callers(2, pcs[:])
+		rec := slog.NewRecord(time.Now(), slog.LevelDebug, "test", pcs[0])
+		rec.Add("key", "value_secret_long")
+
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "secret")
+
+		AddSecrets(context.WithValue(ctx, "some key", "some value"), "long")
+
 		err := h(ctx, rec)
 		require.NoError(t, err)
 	})
