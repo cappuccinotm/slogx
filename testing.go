@@ -18,33 +18,61 @@ func (nopHandler) Handle(context.Context, slog.Record) error { return nil }
 func (n nopHandler) WithAttrs([]slog.Attr) slog.Handler      { return n }
 func (n nopHandler) WithGroup(string) slog.Handler           { return n }
 
+type testingOpts struct {
+	splitMultiline bool
+}
+
+// TestingOpt is an option for TestHandler.
+type TestingOpt func(*testingOpts)
+
+// SplitMultiline enables splitting multiline messages into multiple log lines.
+func SplitMultiline() TestingOpt {
+	return func(opts *testingOpts) {
+		opts.splitMultiline = true
+	}
+}
+
 // TestHandler returns a slog.Handler, that directs all log messages to the
 // t.Logf function with the "[slog]" prefix.
 // It also shortens some common attributes, like "time" and "level" to "t" and "l"
 // and truncates the time to "15:04:05.000" format.
-func TestHandler(t testingT) slog.Handler {
+func TestHandler(t testingT, topts ...TestingOpt) slog.Handler {
 	t.Helper()
 
-	opts := &slog.HandlerOptions{
+	options := testingOpts{}
+	for _, opt := range topts {
+		opt(&options)
+	}
+
+	handlerOpts := &slog.HandlerOptions{
 		AddSource: true,
 		Level:     slog.LevelDebug,
 		ReplaceAttr: func(_ []string, a slog.Attr) slog.Attr {
-			switch a.Key {
-			case slog.TimeKey:
+			switch {
+			case a.Key == slog.TimeKey: // shorten full time to "15:04:05.000"
 				tt := a.Value.Time()
 				return slog.String("t", tt.Format("15:04:05.000"))
-			case slog.LevelKey:
+			case a.Key == slog.LevelKey: // shorten "level":"debug" to "l":"debug"
 				return slog.String("l", a.Value.String())
-			case slog.SourceKey:
+			case a.Key == slog.SourceKey: // shorten "source":"full/path/to/file.go:123" to "s":"file.go:123"
 				src := a.Value.Any().(*slog.Source)
 				file := src.File[strings.LastIndex(src.File, "/")+1:]
 				return slog.String("s", fmt.Sprintf("%s:%d", file, src.Line))
+			case a.Key == slog.MessageKey && options.splitMultiline &&
+				strings.Contains(a.Value.String(), "\n"): // print the multiline message to t.Log, instead of slog
+				msg := a.Value.String()
+				lines := strings.Split(msg, "\n")
+				for _, line := range lines {
+					t.Log(line)
+				}
+
+				return slog.String(slog.MessageKey, "message with newlines has been printed to t.Log")
 			default:
 				return a
 			}
 		},
 	}
-	return slog.NewTextHandler(tWriter{t: t}, opts)
+	return slog.NewTextHandler(tWriter{t: t}, handlerOpts)
 }
 
 type testingT interface {
