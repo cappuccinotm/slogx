@@ -1,42 +1,28 @@
-package slogx
+// Package slogt provides functions for comfortable using of slog in tests.
+package slogt
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
 	"log/slog"
 )
 
-// NopHandler returns a slog.Handler, that does nothing.
-func NopHandler() slog.Handler { return nopHandler{} }
-
-type nopHandler struct{}
-
-func (nopHandler) Enabled(context.Context, slog.Level) bool  { return false }
-func (nopHandler) Handle(context.Context, slog.Record) error { return nil }
-func (n nopHandler) WithAttrs([]slog.Attr) slog.Handler      { return n }
-func (n nopHandler) WithGroup(string) slog.Handler           { return n }
-
 type testingOpts struct {
 	splitMultiline bool
 }
 
-// TestingOpt is an option for TestHandler.
+// TestingOpt is an option for Handler.
 type TestingOpt func(*testingOpts)
 
 // SplitMultiline enables splitting multiline messages into multiple log lines.
-func SplitMultiline() TestingOpt {
-	return func(opts *testingOpts) {
-		opts.splitMultiline = true
-	}
-}
+func SplitMultiline(opts *testingOpts) { opts.splitMultiline = true }
 
-// TestHandler returns a slog.Handler, that directs all log messages to the
+// Handler returns a slog.Handler, that directs all log messages to the
 // t.Logf function with the "[slog]" prefix.
 // It also shortens some common attributes, like "time" and "level" to "t" and "l"
 // and truncates the time to "15:04:05.000" format.
-func TestHandler(t testingT, topts ...TestingOpt) slog.Handler {
+func Handler(t testingT, topts ...TestingOpt) slog.Handler {
 	t.Helper()
 
 	options := testingOpts{}

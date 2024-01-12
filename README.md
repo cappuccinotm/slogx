@@ -133,5 +133,26 @@ l := logger.New(
 - `logger.WithBody(maxBodySize int)` - logs the request and response body, maximum size of the logged body is set by `maxBodySize`.
 - `logger.WithUser(fn func(*http.Request) (string, error))` - sets a function to get the user data from the request.
 
+## Testing handler
+Library provides a `slogt.TestHandler` function to build a test handler, which will print out the log entries through `testing.T`'s `Log` function. It will shorten attributes, so the output will be more readable.
+
+### Usage
+```go
+func TestSomething(t *testing.T) {
+    h := slogt.Handler(t, slogt.SplitMultiline)
+    logger := slog.New(h)
+    logger.Info("some\nmultiline\nmessage", slog.String("key", "value"))
+}
+
+// Output:
+// === RUN   TestSomething
+//     handler.go:306: t=11:36:28.649 l=DEBUG s=main_test.go:12 msg="some single-line message" key=value group.groupKey=groupValue
+//     
+//     testing.go:52: some
+//     testing.go:52: multiline
+//     testing.go:52: message
+//     handler.go:306: t=11:36:28.649 l=INFO s=main_test.go:17 msg="message with newlines has been printed to t.Log" key=value
+```
+
 ## Status
 The code is still under development. Until v1.x released the API may change.

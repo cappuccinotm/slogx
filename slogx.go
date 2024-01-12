@@ -46,3 +46,13 @@ func Error(err error) slog.Attr {
 		return slog.String(ErrorKey, err.Error())
 	}
 }
+
+// NopHandler returns a slog.Handler, that does nothing.
+func NopHandler() slog.Handler { return nopHandler{} }
+
+type nopHandler struct{}
+
+func (nopHandler) Enabled(context.Context, slog.Level) bool  { return false }
+func (nopHandler) Handle(context.Context, slog.Record) error { return nil }
+func (n nopHandler) WithAttrs([]slog.Attr) slog.Handler      { return n }
+func (n nopHandler) WithGroup(string) slog.Handler           { return n }

@@ -1,4 +1,4 @@
-package slogx
+package slogt
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ import (
 func Test_TestHandler(t *testing.T) {
 	t.Run("singleline", func(t *testing.T) {
 		tm := &testTMock{t: t}
-		l := slog.New(TestHandler(tm))
+		l := slog.New(Handler(tm))
 		l.Debug("test", slog.String("key", "value"))
 
 		assert.Len(t, tm.rows, 1, "should be 1 row")
@@ -24,13 +24,13 @@ func Test_TestHandler(t *testing.T) {
 		assert.Contains(t, tm.rows[0], " key=value")
 
 		// show how it prints log
-		l = slog.New(TestHandler(t))
+		l = slog.New(Handler(t))
 		l.Debug("test", slog.String("key", "value"))
 	})
 
 	t.Run("multiline", func(t *testing.T) {
 		tm := &testTMock{t: t}
-		l := slog.New(TestHandler(tm, SplitMultiline()))
+		l := slog.New(Handler(tm, SplitMultiline))
 		l.Debug("some\nmultiline\nmessage")
 		assert.Len(t, tm.rows, 4, "should be 4 rows")
 		assert.Equal(t, "some\nmultiline\nmessage", strings.Join(tm.rows[:3], "\n"))
@@ -53,6 +53,8 @@ func (t *testTMock) Log(args ...any) {
 	row, ok := args[0].(string)
 	require.True(t.t, ok, "must be string argument")
 	t.rows = append(t.rows, row)
+
+	t.t.Log(row)
 }
 
 func (t *testTMock) Helper() {}
