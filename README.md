@@ -20,6 +20,10 @@ go get github.com/cappuccinotm/slogx
       ctx = slogm.AddSecrets(ctx)
       ```
 
+## Helpers
+- `slogx.Error(err error)` - adds an error to the log entry under "error" key.
+- `slogx.NopHandler() slog.Handler` - returns a handler that does nothing. Can be used in tests, to disable logging.
+
 ## Example
 
 ```go
