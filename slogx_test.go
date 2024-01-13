@@ -35,7 +35,7 @@ func TestError(t *testing.T) {
 
 			attr := Error(nil)
 			assert.Equal(t, attr.Key, ErrorKey)
-			assert.Equal(t, attr.Value.String(), "nil")
+			assert.Nil(t, attr.Value.Any())
 		})
 	})
 }

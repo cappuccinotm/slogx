@@ -33,18 +33,20 @@ type Middleware func(HandleFunc) HandleFunc
 // ErrAttrStrategy specifies how to log errors.
 // "AsIs" logs nils, when the error is nil, if you want to not
 // log nils, use "None".
+// Example:
+//
+//	2024/01/13 15:20:26 ERROR LogAttrAsIs, error       | error="some error"
+//	2024/01/13 15:20:26 ERROR LogAttrAsIs, nil         | error=<nil>
+//	2024/01/13 15:20:26 ERROR LogAttrNone, error       | error="some error"
+//	2024/01/13 15:20:26 ERROR LogAttrNone, nil         |
 var ErrAttrStrategy = LogAttrAsIs
 
 // Error returns an attribute with error key.
 func Error(err error) slog.Attr {
-	switch {
-	case err == nil && ErrAttrStrategy == LogAttrNone:
+	if err == nil && ErrAttrStrategy == LogAttrNone {
 		return slog.Attr{}
-	case err == nil && ErrAttrStrategy == LogAttrAsIs:
-		return slog.String(ErrorKey, "nil")
-	default:
-		return slog.String(ErrorKey, err.Error())
 	}
+	return slog.Any(ErrorKey, err)
 }
 
 // NopHandler returns a slog.Handler, that does nothing.
