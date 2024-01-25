@@ -19,7 +19,7 @@ const (
 )
 
 // Common used keys.
-const (
+var (
 	ErrorKey     = "error"
 	RequestIDKey = "request_id"
 )
