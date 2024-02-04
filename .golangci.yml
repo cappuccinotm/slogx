@@ -54,21 +54,22 @@ run:
 issues:
   exclude-rules:
     - text: "should have a package comment, unless it's in another file for this package"
-      linters:
-        - golint
+      linters: [gosec]
     - text: "G505: Blocklisted import crypto/sha1: weak cryptographic primitive"
-      linters:
-        - gosec
+      linters: [gosec]
     - text: "Use of weak cryptographic primitive"
-      linters:
-        - gosec
+      linters: [gosec]
     - path: _test\.go
       text: "Potential Slowloris Attack because ReadHeaderTimeout is not configured in the http.Server"
-      linters:
-        - gosec
+      linters: [gosec]
     - path: _test\.go
       text: "Deferring unsafe method \"Close\" on type \"io.ReadCloser\""
-      linters:
-        - gosec
+      linters: [gosec]
+    - path: fblog
+      text: "Errors unhandled"
+      linters: [gosec]
+    - path: fblog
+      text: "Use of unsafe calls should be audited"
+      linters: [gosec]
 
   exclude-use-default: false

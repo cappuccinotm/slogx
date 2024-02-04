@@ -6,6 +6,30 @@ Package slogx contains extensions for standard library's slog package.
 go get github.com/cappuccinotm/slogx
 ```
 
+## Handlers
+- `slog.Chain` - chains the multiple "middlewares" - handlers, which can modify the log entry.
+- `fblog.Handler` - a handler that logs the log entry in the [fblog-like](https://github.com/brocode/fblog) format, like:
+  ```
+  2024-02-05 09:11:37  [INFO]: info message
+                          key: 1
+       some_multi_line_string: "line1\nline2\nline3"
+                multiline_any: "line1\nline2\nline3"
+                    group.int: 1
+                 group.string: "string"
+                group.float64: 1.1
+                   group.bool: false
+   ...some_very_very_long_key: 1
+  ```
+
+  Some benchmarks (though this handler wasn't designed for performance, but for comfortable reading of the logs in debug/local mode):
+  ```
+  BenchmarkFBlog-8       	 1541486	       739.9 ns/op	     672 B/op	       8 allocs/op
+  BenchmarkSlogJSON-8   	 2416308	       489.8 ns/op	      48 B/op	       1 allocs/op
+  BenchmarkSlogText-8   	 2448660	       487.3 ns/op	      48 B/op	       1 allocs/op
+  ```
+  
+  All the benchmarks were run on a MacBook Pro (14-inch, 2021) with Apple M1 processor, the benchmark contains the only log `lg.Info("message", slog.Int("int", 1))`
+
 ## Middlewares
 - `slogm.RequestID()` - adds a request ID to the context and logs it.
   - `slogm.ContextWithRequestID(ctx context.Context, requestID string) context.Context` - adds a request ID to the context.
