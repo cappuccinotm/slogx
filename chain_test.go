@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"log/slog"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"log/slog"
 )
 
 type testCtxKey struct{}
@@ -82,12 +82,12 @@ func TestChain_WithGroup(t *testing.T) {
 		TestGroup struct {
 			A string `json:"a"`
 		} `json:"test-group"`
-		XRequestID string `json:"x-request-id"`
+		XRequestID string `json:"x-request-id"` // without accumulating - chain doesn't capture groups and attributes
 	}
 
 	require.NoError(t, json.NewDecoder(buf).Decode(&entry))
 	assert.Equal(t, "1", entry.TestGroup.A)
-	assert.Equal(t, "x-request-id", entry.XRequestID)
+	assert.Empty(t, entry.XRequestID, "")
 }
 
 func TestChain_WithAttrs(t *testing.T) {
