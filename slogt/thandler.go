@@ -3,9 +3,8 @@ package slogt
 
 import (
 	"fmt"
-	"strings"
-
 	"log/slog"
+	"strings"
 )
 
 type testingOpts struct {

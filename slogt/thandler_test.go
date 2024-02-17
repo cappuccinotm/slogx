@@ -2,12 +2,12 @@ package slogt
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"log/slog"
 )
 
 func Test_TestHandler(t *testing.T) {
@@ -19,7 +19,7 @@ func Test_TestHandler(t *testing.T) {
 		assert.Len(t, tm.rows, 1, "should be 1 row")
 		assert.Contains(t, tm.rows[0], "t=")
 		assert.Contains(t, tm.rows[0], fmt.Sprintf(" l=%s", slog.LevelDebug.String()))
-		assert.Contains(t, tm.rows[0], " s=testing_test.go:17")
+		assert.Contains(t, tm.rows[0], " s=thandler_test.go:17")
 		assert.Contains(t, tm.rows[0], fmt.Sprintf(" %s=test", slog.MessageKey))
 		assert.Contains(t, tm.rows[0], " key=value")
 
@@ -36,7 +36,7 @@ func Test_TestHandler(t *testing.T) {
 		assert.Equal(t, "some\nmultiline\nmessage", strings.Join(tm.rows[:3], "\n"))
 		assert.Contains(t, tm.rows[3], "t=")
 		assert.Contains(t, tm.rows[3], fmt.Sprintf(" l=%s", slog.LevelDebug.String()))
-		assert.Contains(t, tm.rows[3], " s=testing_test.go:34")
+		assert.Contains(t, tm.rows[3], " s=thandler_test.go:34")
 		assert.Contains(t, tm.rows[3], `msg="message with newlines has been printed to t.Log"`)
 	})
 }
