@@ -50,7 +50,7 @@ func (a *accumulator) WithGroup(group string) slog.Handler {
 
 func (a *accumulator) assemble() (attrs []slog.Attr) {
 	for p := a.last; p != nil; p = p.parent {
-		attrs = append(attrs, p.attrs...)
+		attrs = append(p.attrs, attrs...)
 		if p.group != "" {
 			attrs = []slog.Attr{slog.Group(p.group, listAny(attrs)...)}
 		}

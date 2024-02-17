@@ -18,6 +18,11 @@ func (handlerFunc) WithGroup(string) slog.Handler                       { return
 func (handlerFunc) Enabled(context.Context, slog.Level) bool            { return true }
 
 func TestAccumulator_Handle(t *testing.T) {
+	t.Run("test", func(t *testing.T) {
+		lg := slog.New(slogt.Handler(t))
+		lg.WithGroup("abacaba").Info("test")
+	})
+
 	t.Run("accumulate only attributes", func(t *testing.T) {
 		acc := Accumulator(handlerFunc(func(ctx context.Context, rec slog.Record) error {
 			var attrs []slog.Attr
