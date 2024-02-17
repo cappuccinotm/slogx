@@ -19,22 +19,20 @@ func (handlerFunc) Enabled(context.Context, slog.Level) bool            { return
 
 func TestAccumulator_Handle(t *testing.T) {
 	t.Run("accumulate only attributes", func(t *testing.T) {
-		acc := &accumulator{
-			Handler: handlerFunc(func(ctx context.Context, rec slog.Record) error {
-				var attrs []slog.Attr
-				rec.Attrs(func(attr slog.Attr) bool {
-					attrs = append(attrs, attr)
-					return true
-				})
-				assert.Equal(t, []slog.Attr{
-					slog.String("c", "3"),
-					slog.String("d", "4"),
-					slog.String("a", "1"),
-					slog.String("b", "2"),
-				}, attrs)
-				return nil
-			}),
-		}
+		acc := Accumulator(handlerFunc(func(ctx context.Context, rec slog.Record) error {
+			var attrs []slog.Attr
+			rec.Attrs(func(attr slog.Attr) bool {
+				attrs = append(attrs, attr)
+				return true
+			})
+			assert.Equal(t, []slog.Attr{
+				slog.String("c", "3"),
+				slog.String("d", "4"),
+				slog.String("a", "1"),
+				slog.String("b", "2"),
+			}, attrs)
+			return nil
+		}))
 
 		err := acc.
 			WithAttrs([]slog.Attr{
@@ -50,28 +48,26 @@ func TestAccumulator_Handle(t *testing.T) {
 	})
 
 	t.Run("accumulate groups and attributes", func(t *testing.T) {
-		acc := &accumulator{
-			Handler: handlerFunc(func(ctx context.Context, rec slog.Record) error {
-				var attrs []slog.Attr
-				rec.Attrs(func(attr slog.Attr) bool {
-					attrs = append(attrs, attr)
-					return true
-				})
-				if !assert.Equal(t, []slog.Attr{
-					slog.Group("g1",
-						slog.Group("g2",
-							slog.String("c", "3"),
-							slog.String("d", "4"),
-						),
-						slog.String("a", "1"),
-						slog.String("b", "2"),
+		acc := Accumulator(handlerFunc(func(ctx context.Context, rec slog.Record) error {
+			var attrs []slog.Attr
+			rec.Attrs(func(attr slog.Attr) bool {
+				attrs = append(attrs, attr)
+				return true
+			})
+			if !assert.Equal(t, []slog.Attr{
+				slog.Group("g1",
+					slog.Group("g2",
+						slog.String("c", "3"),
+						slog.String("d", "4"),
 					),
-				}, attrs) {
-					require.NoError(t, slogt.Handler(t).Handle(ctx, rec))
-				}
-				return nil
-			}),
-		}
+					slog.String("a", "1"),
+					slog.String("b", "2"),
+				),
+			}, attrs) {
+				require.NoError(t, slogt.Handler(t).Handle(ctx, rec))
+			}
+			return nil
+		}))
 		err := acc.WithGroup("g1").
 			WithAttrs([]slog.Attr{
 				slog.String("a", "1"),
