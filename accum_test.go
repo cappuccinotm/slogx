@@ -61,12 +61,12 @@ func TestAccumulator_Handle(t *testing.T) {
 			})
 			if !assert.Equal(t, []slog.Attr{
 				slog.Group("g1",
+					slog.String("a", "1"),
+					slog.String("b", "2"),
 					slog.Group("g2",
 						slog.String("c", "3"),
 						slog.String("d", "4"),
 					),
-					slog.String("a", "1"),
-					slog.String("b", "2"),
 				),
 			}, attrs) {
 				require.NoError(t, slogt.Handler(t).Handle(ctx, rec))
