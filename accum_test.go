@@ -10,13 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type handlerFunc func(ctx context.Context, rec slog.Record) error
-
-func (f handlerFunc) Handle(ctx context.Context, rec slog.Record) error { return f(ctx, rec) }
-func (handlerFunc) WithAttrs([]slog.Attr) slog.Handler                  { return NopHandler() }
-func (handlerFunc) WithGroup(string) slog.Handler                       { return NopHandler() }
-func (handlerFunc) Enabled(context.Context, slog.Level) bool            { return true }
-
 func TestAccumulator_Handle(t *testing.T) {
 	t.Run("test", func(t *testing.T) {
 		lg := slog.New(slogt.Handler(t))
@@ -24,7 +17,7 @@ func TestAccumulator_Handle(t *testing.T) {
 	})
 
 	t.Run("accumulate only attributes", func(t *testing.T) {
-		acc := Accumulator(handlerFunc(func(ctx context.Context, rec slog.Record) error {
+		acc := Accumulator(slogt.HandlerFunc(func(ctx context.Context, rec slog.Record) error {
 			var attrs []slog.Attr
 			rec.Attrs(func(attr slog.Attr) bool {
 				attrs = append(attrs, attr)
@@ -53,7 +46,7 @@ func TestAccumulator_Handle(t *testing.T) {
 	})
 
 	t.Run("accumulate groups and attributes", func(t *testing.T) {
-		acc := Accumulator(handlerFunc(func(ctx context.Context, rec slog.Record) error {
+		acc := Accumulator(slogt.HandlerFunc(func(ctx context.Context, rec slog.Record) error {
 			var attrs []slog.Attr
 			rec.Attrs(func(attr slog.Attr) bool {
 				attrs = append(attrs, attr)

@@ -39,3 +39,24 @@ func TestError(t *testing.T) {
 		})
 	})
 }
+
+func TestAttrs(t *testing.T) {
+	t.Run("empty", func(t *testing.T) {
+		rec := slog.Record{}
+		attrs := Attrs(rec)
+		assert.Empty(t, attrs)
+	})
+
+	t.Run("non-empty", func(t *testing.T) {
+		rec := slog.Record{}
+		rec.AddAttrs(
+			slog.String("a", "1"),
+			slog.String("b", "2"),
+		)
+		attrs := Attrs(rec)
+		assert.Equal(t, []slog.Attr{
+			slog.String("a", "1"),
+			slog.String("b", "2"),
+		}, attrs)
+	})
+}

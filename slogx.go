@@ -3,7 +3,6 @@ package slogx
 
 import (
 	"context"
-
 	"log/slog"
 )
 
@@ -47,6 +46,16 @@ func Error(err error) slog.Attr {
 		return slog.Attr{}
 	}
 	return slog.Any(ErrorKey, err)
+}
+
+// Attrs returns attributes from the given record.
+func Attrs(rec slog.Record) []slog.Attr {
+	var attrs []slog.Attr
+	rec.Attrs(func(attr slog.Attr) bool {
+		attrs = append(attrs, attr)
+		return true
+	})
+	return attrs
 }
 
 // NopHandler returns a slog.Handler, that does nothing.
