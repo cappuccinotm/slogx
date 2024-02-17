@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"errors"
-	"github.com/cappuccinotm/slogx/slogm"
+	"log/slog"
 	"os"
+
+	"github.com/cappuccinotm/slogx/slogm"
 
 	"github.com/cappuccinotm/slogx"
 	"github.com/google/uuid"
-	"log/slog"
 )
 
 func main() {
@@ -17,11 +18,11 @@ func main() {
 		Level:     slog.LevelInfo,
 	})
 
-	logger := slog.New(slogx.NewChain(h,
+	logger := slog.New(slogx.Accumulator(slogx.NewChain(h,
 		slogm.RequestID(),
 		slogm.StacktraceOnError(),
 		slogm.MaskSecrets("***"),
-	))
+	)))
 
 	ctx := slogm.ContextWithRequestID(context.Background(), uuid.New().String())
 	ctx = slogm.AddSecrets(ctx, "secret")
