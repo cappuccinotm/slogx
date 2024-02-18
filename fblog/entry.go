@@ -150,6 +150,6 @@ func (e *entry) spaces(n int, alreadyGrown bool) {
 		e.buf.Grow(n)
 	}
 	for i := 0; i < n; i++ {
-		e.buf.WriteRune(' ')
+		e.buf.WriteByte(' ')
 	}
 }

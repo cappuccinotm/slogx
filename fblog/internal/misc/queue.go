@@ -1,3 +1,5 @@
+// Package misc provides miscellaneous data types and functions
+// for better processing of log entries.
 package misc
 
 const minCap = 4
