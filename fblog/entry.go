@@ -1,6 +1,7 @@
 package fblog
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log/slog"
@@ -15,7 +16,7 @@ type entry struct {
 
 	// internal use
 	headerLen int
-	buf       *misc.NewlineBuffer
+	buf       *bytes.Buffer
 	q         *misc.Queue[grouped]
 }
 
@@ -23,7 +24,7 @@ const lvlSize = 7 // length of the level with braces, e.g. "[DEBUG]"
 
 func newEntry(timeFmt string, rep func([]string, slog.Attr) slog.Attr, numAttrs int) *entry {
 	return &entry{
-		buf:     misc.NewNewlineBuffer(numAttrs),
+		buf:     bytes.NewBuffer(nil),
 		q:       misc.NewQueue[grouped](numAttrs),
 		timeFmt: timeFmt,
 		rep:     rep,

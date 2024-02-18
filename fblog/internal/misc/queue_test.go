@@ -29,4 +29,38 @@ func TestQueue(t *testing.T) {
 		assert.Equal(t, 1, q.end)
 		assert.Equal(t, 0, q.idx)
 	})
+
+	t.Run("push-pop", func(t *testing.T) {
+		q := NewQueue[int](6)
+		q.PushBack(1)
+		q.PushBack(2)
+		q.PushBack(3)
+		assert.Equal(t, 3, q.Len())
+		assert.Equal(t, 1, q.PopFront())
+		assert.Equal(t, 2, q.PopFront())
+		assert.Equal(t, 3, q.PopFront())
+	})
+
+	t.Run("push to rotated", func(t *testing.T) {
+		q := NewQueue[int](2)
+		q.PushBack(1)
+		q.PushBack(2)
+		assert.Equal(t, 2, q.Len())
+		assert.Equal(t, 1, q.PopFront())
+		q.PushBack(3)
+		assert.Equal(t, 2, q.PopFront())
+		assert.Equal(t, 3, q.PopFront())
+		q.PushBack(4)
+		assert.Equal(t, 4, q.PopFront())
+	})
+
+	t.Run("pop from empty queue", func(t *testing.T) {
+		q := NewQueue[int](6)
+		assert.Panics(t, func() { q.PopFront() })
+	})
+
+	t.Run("min cap always preset", func(t *testing.T) {
+		q := NewQueue[int](-10)
+		assert.Equal(t, minCap, cap(q.l))
+	})
 }

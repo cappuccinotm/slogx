@@ -1,5 +1,7 @@
 package misc
 
+const minCap = 4
+
 // Queue is an implementation of the list data structure,
 // it is a FIFO (first in, first out) data structure over a slice.
 type Queue[T any] struct {
@@ -33,7 +35,7 @@ func (q *Queue[T]) PushBack(e T) {
 
 // PopFront removes the first element from the queue and returns it.
 func (q *Queue[T]) PopFront() T {
-	if q.idx > q.end {
+	if q.idx >= q.end {
 		panic("pop from empty queue")
 	}
 	e := q.l[q.idx]

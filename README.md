@@ -23,9 +23,13 @@ go get github.com/cappuccinotm/slogx
 
   Some benchmarks (though this handler wasn't designed for performance, but for comfortable reading of the logs in debug/local mode):
   ```
-  BenchmarkFBlog-8       	 1541486	       739.9 ns/op	     672 B/op	       8 allocs/op
-  BenchmarkSlogJSON-8   	 2416308	       489.8 ns/op	      48 B/op	       1 allocs/op
-  BenchmarkSlogText-8   	 2448660	       487.3 ns/op	      48 B/op	       1 allocs/op
+  BenchmarkHandler
+  BenchmarkHandler/fblog.NewHandler
+  BenchmarkHandler/fblog.NewHandler-8         	 1479525	       800.9 ns/op	     624 B/op	       8 allocs/op
+  BenchmarkHandler/slog.NewJSONHandler
+  BenchmarkHandler/slog.NewJSONHandler-8      	 2407322	       500.0 ns/op	      48 B/op	       1 allocs/op
+  BenchmarkHandler/slog.NewTextHandler
+  BenchmarkHandler/slog.NewTextHandler-8      	 2404581	       490.0 ns/op	      48 B/op	       1 allocs/op
   ```
   
   All the benchmarks were run on a MacBook Pro (14-inch, 2021) with Apple M1 processor, the benchmark contains the only log `lg.Info("message", slog.Int("int", 1))`

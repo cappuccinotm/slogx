@@ -406,38 +406,40 @@ func correctTimestamps(s string) string {
 	return strings.Join(lines, "\n")
 }
 
-func BenchmarkFBlog(b *testing.B) {
-	b.ReportAllocs()
-	h := NewHandler(Out(io.Discard))
-	lg := slog.New(h)
+func BenchmarkHandler(b *testing.B) {
+	b.Run("fblog.NewHandler", func(b *testing.B) {
+		b.ReportAllocs()
+		h := NewHandler(Out(io.Discard))
+		lg := slog.New(h)
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		lg.Info("message", slog.Int("int", 1))
-	}
-	b.StopTimer()
-}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			lg.Info("message", slog.Int("int", 1))
+		}
+		b.StopTimer()
+	})
 
-func BenchmarkSlogJSON(b *testing.B) {
-	b.ReportAllocs()
-	h := slog.NewJSONHandler(io.Discard, &slog.HandlerOptions{})
-	lg := slog.New(h)
+	b.Run("slog.NewJSONHandler", func(b *testing.B) {
+		b.ReportAllocs()
+		h := slog.NewJSONHandler(io.Discard, &slog.HandlerOptions{})
+		lg := slog.New(h)
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		lg.Info("message", slog.Int("int", 1))
-	}
-	b.StopTimer()
-}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			lg.Info("message", slog.Int("int", 1))
+		}
+		b.StopTimer()
+	})
 
-func BenchmarkSlogText(b *testing.B) {
-	b.ReportAllocs()
-	h := slog.NewTextHandler(io.Discard, &slog.HandlerOptions{})
-	lg := slog.New(h)
+	b.Run("slog.NewTextHandler", func(b *testing.B) {
+		b.ReportAllocs()
+		h := slog.NewTextHandler(io.Discard, &slog.HandlerOptions{})
+		lg := slog.New(h)
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		lg.Info("message", slog.Int("int", 1))
-	}
-	b.StopTimer()
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			lg.Info("message", slog.Int("int", 1))
+		}
+		b.StopTimer()
+	})
 }
