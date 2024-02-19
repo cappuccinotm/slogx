@@ -7,7 +7,10 @@ go get github.com/cappuccinotm/slogx
 ```
 
 ## Handlers
+- `slogx.Accumulator(slog.Handler) slog.Handler` - returns a handler that accumulates attributes and groups from the `WithGroup` and `WithAttrs` calls, to pass them to the underlying handler only on `Handle` call. Allows middlewares to capture the handler-level attributes and groups, but may be consuming.
+- `slogx.NopHandler() slog.Handler` - returns a handler that does nothing. Can be used in tests, to disable logging.
 - `slog.Chain` - chains the multiple "middlewares" - handlers, which can modify the log entry.
+- `slogt.TestHandler` - returns a handler that logs the log entry through `testing.T`'s `Log` function. It will shorten attributes, so the output will be more readable.
 - `fblog.Handler` - a handler that logs the log entry in the [fblog-like](https://github.com/brocode/fblog) format, like:
   ```
   2024-02-05 09:11:37  [INFO]: info message
@@ -49,9 +52,7 @@ go get github.com/cappuccinotm/slogx
       ```
 
 ## Helpers
-- `slogx.Accumulator(slog.Handler) slog.Handler` - returns a handler that accumulates attributes and groups from the `WithGroup` and `WithAttrs` calls, to pass them to the underlying handler only on `Handle` call. Allows middlewares to capture the handler-level attributes and groups, but may be consuming.
 - `slogx.Error(err error)` - adds an error to the log entry under "error" key.
-- `slogx.NopHandler() slog.Handler` - returns a handler that does nothing. Can be used in tests, to disable logging.
 
 ## Example
 
