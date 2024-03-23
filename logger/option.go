@@ -2,11 +2,11 @@ package logger
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"net/url"
 
 	"github.com/cappuccinotm/slogx"
-	"log/slog"
 )
 
 // Option is a function that configures a Logger.
@@ -34,6 +34,21 @@ func WithLogger(logger *slog.Logger) Option {
 // WithLogFn sets a custom log function.
 func WithLogFn(fn func(context.Context, *LogParts)) Option {
 	return func(l *Logger) { l.logFn = fn }
+}
+
+// WithSanitizeHeaders sets a custom function to sanitize headers.
+func WithSanitizeHeaders(fn func(http.Header) map[string]string) Option {
+	return func(l *Logger) { l.sanitizeHeadersFn = fn }
+}
+
+// WithSanitizeQuery sets a custom function to sanitize query parameters.
+func WithSanitizeQuery(fn func(string) string) Option {
+	return func(l *Logger) { l.sanitizeQueryFn = fn }
+}
+
+// WithMaskIP sets a custom function to mask IP addresses.
+func WithMaskIP(fn func(string) string) Option {
+	return func(l *Logger) { l.maskIPFn = fn }
 }
 
 // Log2Slog is the default log function that logs to slog.
