@@ -57,6 +57,31 @@ func TestMaskSecrets(t *testing.T) {
 		require.NoError(t, err)
 	})
 
+	t.Run("no secrets in attrs, message contains secrets", func(t *testing.T) {
+		mw := MaskSecrets("***")
+		h := mw(func(ctx context.Context, rec slog.Record) error {
+			assert.Equal(t, 1, rec.NumAttrs())
+			assert.Equal(t, "some very *** ***", rec.Message)
+			rec.Attrs(func(attr slog.Attr) bool {
+				assert.Equal(t, "key", attr.Key)
+				assert.Equal(t, "nons value", attr.Value.String())
+				return true
+			})
+			return nil
+		})
+
+		var pcs [1]uintptr
+		runtime.Callers(2, pcs[:])
+		rec := slog.NewRecord(time.Now(), slog.LevelDebug, "some very secret secret", pcs[0])
+		rec.Add("key", "nons value")
+
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "secret")
+
+		err := h(ctx, rec)
+		require.NoError(t, err)
+	})
+
 	t.Run("not-stringable attr", func(t *testing.T) {
 		mw := MaskSecrets("***")
 		h := mw(func(ctx context.Context, rec slog.Record) error {

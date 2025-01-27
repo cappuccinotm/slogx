@@ -81,11 +81,12 @@ func MaskSecrets(replacement string) slogx.Middleware {
 				return true
 			})
 
-			if !hasMaskedAttrs {
+			msg, hasMaskedMessage := mask(secrets, replacement, rec.Message)
+
+			if !hasMaskedAttrs && !hasMaskedMessage {
 				return next(ctx, rec)
 			}
 
-			msg, _ := mask(secrets, replacement, rec.Message)
 			nrec := slog.NewRecord(rec.Time, rec.Level, msg, rec.PC)
 			nrec.AddAttrs(nattrs...)
 
