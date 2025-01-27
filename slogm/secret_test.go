@@ -14,13 +14,46 @@ import (
 
 func TestMaskSecrets(t *testing.T) {
 	t.Run("no attrs", func(t *testing.T) {
-		mw := TrimAttrs(10)
+		mw := MaskSecrets("***")
 		h := mw(func(ctx context.Context, rec slog.Record) error {
-			assert.Equal(t, 0, rec.NumAttrs())
+			assert.Equal(t, slog.LevelDebug, rec.Level)
+			assert.Equal(t, "test", rec.Message)
 			return nil
 		})
 
-		err := h(context.Background(), slog.Record{})
+		var pcs [1]uintptr
+		runtime.Callers(2, pcs[:])
+		rec := slog.NewRecord(time.Now(), slog.LevelDebug, "test", pcs[0])
+
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "secret")
+
+		err := h(ctx, rec)
+		require.NoError(t, err)
+	})
+
+	t.Run("message contains secrets", func(t *testing.T) {
+		mw := MaskSecrets("***")
+		h := mw(func(ctx context.Context, rec slog.Record) error {
+			assert.Equal(t, 1, rec.NumAttrs())
+			assert.Equal(t, "some very *** ***", rec.Message)
+			rec.Attrs(func(attr slog.Attr) bool {
+				assert.Equal(t, "key", attr.Key)
+				assert.Equal(t, "*** value", attr.Value.String())
+				return true
+			})
+			return nil
+		})
+
+		var pcs [1]uintptr
+		runtime.Callers(2, pcs[:])
+		rec := slog.NewRecord(time.Now(), slog.LevelDebug, "some very secret secret", pcs[0])
+		rec.Add("key", "secret value")
+
+		ctx := context.Background()
+		ctx = AddSecrets(ctx, "secret")
+
+		err := h(ctx, rec)
 		require.NoError(t, err)
 	})
 

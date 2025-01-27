@@ -75,7 +75,7 @@ func MaskSecrets(replacement string) slogx.Middleware {
 			var nattrs []slog.Attr
 			hasMaskedAttrs := false
 			rec.Attrs(func(attr slog.Attr) bool {
-				nattr, trimmed := mask(replacement, secrets, attr)
+				nattr, trimmed := maskAttr(secrets, replacement, attr)
 				nattrs = append(nattrs, nattr)
 				hasMaskedAttrs = hasMaskedAttrs || trimmed
 				return true
@@ -85,7 +85,8 @@ func MaskSecrets(replacement string) slogx.Middleware {
 				return next(ctx, rec)
 			}
 
-			nrec := slog.NewRecord(rec.Time, rec.Level, rec.Message, rec.PC)
+			msg, _ := mask(secrets, replacement, rec.Message)
+			nrec := slog.NewRecord(rec.Time, rec.Level, msg, rec.PC)
 			nrec.AddAttrs(nattrs...)
 
 			return next(ctx, nrec)
@@ -93,7 +94,7 @@ func MaskSecrets(replacement string) slogx.Middleware {
 	}
 }
 
-func mask(replacement string, secrets []string, attr slog.Attr) (res slog.Attr, masked bool) {
+func maskAttr(secrets []string, replacement string, attr slog.Attr) (res slog.Attr, masked bool) {
 	attr.Value = attr.Value.Resolve()
 
 	str, ok := stringValue(attr)
@@ -101,10 +102,14 @@ func mask(replacement string, secrets []string, attr slog.Attr) (res slog.Attr, 
 		return attr, false
 	}
 
+	str, masked = mask(secrets, replacement, str)
+	return slog.String(attr.Key, str), masked
+}
+
+func mask(secrets []string, replacement, str string) (res string, masked bool) {
 	for _, secret := range secrets {
 		masked = masked || strings.Contains(str, secret)
 		str = strings.ReplaceAll(str, secret, replacement)
 	}
-
-	return slog.String(attr.Key, str), masked
+	return str, masked
 }
