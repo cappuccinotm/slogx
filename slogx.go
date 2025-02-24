@@ -58,6 +58,28 @@ func Attrs(rec slog.Record) []slog.Attr {
 	return attrs
 }
 
+// HandleFuncAsMiddleware wrap HandleFunc as Middleware
+func HandleFuncAsMiddleware(handler HandleFunc) Middleware {
+	return func(next HandleFunc) HandleFunc {
+		return func(ctx context.Context, rec slog.Record) error {
+			_ = handler(ctx, rec)
+
+			return next(ctx, rec)
+		}
+	}
+}
+
+// HandlerAsMiddleware wrap slog.Handler as Middleware
+func HandlerAsMiddleware(handler slog.Handler) Middleware {
+	return func(next HandleFunc) HandleFunc {
+		return func(ctx context.Context, rec slog.Record) error {
+			_ = handler.Handle(ctx, rec)
+
+			return next(ctx, rec)
+		}
+	}
+}
+
 // NopHandler returns a slog.Handler, that does nothing.
 func NopHandler() slog.Handler { return nopHandler{} }
 
