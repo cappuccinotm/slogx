@@ -62,7 +62,10 @@ func Attrs(rec slog.Record) []slog.Attr {
 func HandlerAsMiddleware(handler slog.Handler) Middleware {
 	return func(next HandleFunc) HandleFunc {
 		return func(ctx context.Context, rec slog.Record) error {
-			_ = handler.Handle(ctx, rec)
+			err := handler.Handle(ctx, rec)
+			if err != nil {
+				return err
+			}
 
 			return next(ctx, rec)
 		}
