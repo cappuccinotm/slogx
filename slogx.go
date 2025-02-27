@@ -58,8 +58,8 @@ func Attrs(rec slog.Record) []slog.Attr {
 	return attrs
 }
 
-// HandlerAsMiddleware wrap slog.Handler as Middleware
-func HandlerAsMiddleware(handler slog.Handler) Middleware {
+// ApplyHandler wraps slog.Handler as Middleware.
+func ApplyHandler(handler slog.Handler) Middleware {
 	return func(next HandleFunc) HandleFunc {
 		return func(ctx context.Context, rec slog.Record) error {
 			err := handler.Handle(ctx, rec)
