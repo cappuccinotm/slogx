@@ -1,11 +1,10 @@
 module github.com/cappuccinotm/slogx
 
-go 1.21
+go 1.26
 
 require (
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.11.1
 	github.com/tomasen/realip v0.0.0-20180522021738-f0c99a92ddce
-	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53
 )
 
 require (
