@@ -42,7 +42,7 @@ go get github.com/cappuccinotm/slogx
   - `slogm.ContextWithRequestID(ctx context.Context, requestID string) context.Context` - adds a request ID to the context.
 - `slogm.StacktraceOnError()` - adds a stacktrace to the log entry if log entry's level is ERROR.
 - `slogm.TrimAttrs(limit int)` - trims the length of the attributes to `limit`.
-- `slogm.ApplyHandler` - adds `slog.Handler` as a `Middleware`, error from the handler will be ignored.
+- `slogm.ApplyHandler` - adds `slog.Handler` as a `Middleware`, by default errors from this handler are ignored, to log with the rest of the chain use `slogm.LogIntermediateError`.
 - `slogm.MaskSecrets(replacement string)` - masks secrets in logs, which are stored in the context
   - `slogm.AddSecrets(ctx context.Context, secret ...string) context.Context` - adds a secret value to the context
     - Note: secrets are stored in the context as a pointer to the container object, guarded by a mutex. Child context 
