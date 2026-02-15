@@ -11,20 +11,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Install go
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v6
         with:
-          go-version: 1.21
+          go-version: 1.26
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v1.54.1
-          skip-go-installation: true
+          version: v2.9.0
 
       - name: Run tests and extract coverage
         run: |

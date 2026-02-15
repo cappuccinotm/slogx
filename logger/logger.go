@@ -12,8 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tomasen/realip"
 	"log/slog"
+
+	"github.com/tomasen/realip"
 )
 
 // Logger provides methods to log HTTP requests for both server and client sides.
@@ -156,8 +157,8 @@ func (l *Logger) readBody(src io.ReadCloser, getBodyFn func() (io.ReadCloser, er
 		return src, ""
 	}
 
-	if len(body) > 0 {
-		body = strings.Replace(body, "\n", " ", -1)
+	if body != "" {
+		body = strings.ReplaceAll(body, "\n", " ")
 		body = reMultWhtsp.ReplaceAllString(body, " ")
 	}
 
