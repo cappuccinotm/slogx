@@ -18,12 +18,12 @@ jobs:
       - name: Install go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.21
+          go-version: 1.26
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.54.1
+          version: v2.9.0
           skip-go-installation: true
 
       - name: Run tests and extract coverage
