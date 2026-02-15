@@ -1,75 +1,58 @@
-linters-settings:
-  govet:
-    check-shadowing: true
-  golint:
-    min-confidence: 0
-  gocyclo:
-    min-complexity: 20
-  maligned:
-    suggest-new: true
-  goconst:
-    min-len: 2
-    min-occurrences: 2
-  misspell:
-    locale: US
-  lll:
-    line-length: 140
-  gocritic:
-    enabled-tags:
-      - performance
-      - style
-      - experimental
-    disabled-checks:
-      - wrapperFunc
-      - hugeParam
+version: "2"
 
 linters:
+  default: none
   enable:
-    - megacheck
-    - govet
-    - unconvert
-    - unused
-    - gas
-    - gocyclo
-    - misspell
-    - unparam
-    - typecheck
-    - ineffassign
-    - stylecheck
     - gochecknoinits
-    - exportloopref
     - gocritic
+    - gocyclo
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
     - nakedret
-    - gosimple
     - prealloc
-  fast: false
-  disable-all: true
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
 
-run:
-  output:
-    format: tab
-  skip-dirs:
-    - vendor
+  settings:
+    goconst: { min-len: 2, min-occurrences: 2 }
+    gocyclo: { min-complexity: 20 }
+    lll: { line-length: 140 }
+    misspell: { locale: US }
+    gocritic:
+      disabled-checks: [ wrapperFunc, hugeParam ]
+      enabled-tags: [ performance, style, experimental ]
 
-issues:
-  exclude-rules:
-    - text: "should have a package comment, unless it's in another file for this package"
-      linters: [gosec]
-    - text: "G505: Blocklisted import crypto/sha1: weak cryptographic primitive"
-      linters: [gosec]
-    - text: "Use of weak cryptographic primitive"
-      linters: [gosec]
-    - path: _test\.go
-      text: "Potential Slowloris Attack because ReadHeaderTimeout is not configured in the http.Server"
-      linters: [gosec]
-    - path: _test\.go
-      text: "Deferring unsafe method \"Close\" on type \"io.ReadCloser\""
-      linters: [gosec]
-    - path: fblog
-      text: "Errors unhandled"
-      linters: [gosec]
-    - path: fblog
-      text: "Use of unsafe calls should be audited"
-      linters: [gosec]
+  exclusions:
+    generated: lax
+    rules:
+      - { linters: [ gosec ], text: "should have a package comment, unless it's in another file for this package" }
+      - { linters: [ gosec ], text: "G505: Blocklisted import crypto/sha1: weak cryptographic primitive" }
+      - { linters: [ gosec ], text: "Use of weak cryptographic primitive" }
+      - linters: [ gosec ]
+        path: _test\.go
+        text: Potential Slowloris Attack because ReadHeaderTimeout is not configured in the http.Server
+      - linters: [ gosec ]
+        path: _test\.go
+        text: Deferring unsafe method "Close" on type "io.ReadCloser"
+      - linters: [ gosec ]
+        path: fblog
+        text: Errors unhandled
+      - linters: [ gosec ]
+        path: fblog
+        text: Use of unsafe calls should be audited
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 
-  exclude-use-default: false
+formatters:
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
