@@ -51,7 +51,7 @@ func TestLogger(t *testing.T) {
 				case 2:
 					return st.Add(time.Second)
 				default:
-					assert.Fail(t, "unexpected call to now(), called %d times", nowCalled)
+					assert.Failf(t, "unexpected call to now()", "called %d times", nowCalled)
 					return time.Time{}
 				}
 			}
@@ -229,7 +229,7 @@ func TestLogger(t *testing.T) {
 				case 2:
 					return st.Add(time.Second)
 				default:
-					assert.Fail(t, "unexpected call to now(), called %d times", nowCalled)
+					assert.Failf(t, "unexpected call to now()", "called %d times", nowCalled)
 					return time.Time{}
 				}
 			}
@@ -319,7 +319,7 @@ func TestLogger(t *testing.T) {
 			case 2:
 				return st.Add(time.Second)
 			default:
-				assert.Fail(t, "unexpected call to now(), called %d times", nowCalled)
+				assert.Failf(t, "unexpected call to now()", "called %d times", nowCalled)
 				return time.Time{}
 			}
 		}
