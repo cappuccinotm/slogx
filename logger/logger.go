@@ -148,6 +148,10 @@ func (l *Logger) obtainRequestInfo(req *http.Request) *RequestInfo {
 var reMultWhtsp = regexp.MustCompile(`[\s\p{Zs}]{2,}`)
 
 func (l *Logger) readBody(src io.ReadCloser, getBodyFn func() (io.ReadCloser, error)) (r io.ReadCloser, bodyPart string) {
+	if src == nil {
+		return nil, ""
+	}
+
 	if l.maxBodySize <= 0 {
 		return src, ""
 	}
